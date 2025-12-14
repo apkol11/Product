@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.EntityModel
@@ -12,7 +9,7 @@ namespace Domain.EntityModel
         public int ProductId { get; set; }
         [Required]
         public string Name { get; set; }
-         [Required]
+        [Required]
         [ForeignKey(nameof(ProductType))]
         public int? ProductTypeId { get; set; }
         [ForeignKey(nameof(Colour))] public int? ColourID { get; set; }
@@ -26,9 +23,9 @@ namespace Domain.EntityModel
         public DateTime? UpdatedDate { get; set; }
 
         public DateTime? DeletedDate { get; set; }
-
-       public virtual ProductType ProductType { get; set; }
-       public virtual Colour Colour { get; set; }  
+        public string? Description { get; set; }
+        public virtual ProductType ProductType { get; set; }
+        public virtual Colour Colour { get; set; }
 
     }
 }

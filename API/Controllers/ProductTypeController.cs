@@ -1,10 +1,7 @@
 using Business.Interfaces.Handler;
 using Domain.EntityModel;
 using Domain.Request;
-using Domain.Response;
-using Domain.Response;
-using Domain.Response;
-    using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {

@@ -7,25 +7,25 @@ using System.Threading.Tasks;
 
 namespace Business.Handlers
 {
-    /// <summary>
+   
     /// Handles business logic operations related to product types.
-    /// </summary>
+    
     public class ProductTypeHandler : IProductTypeHandler
     {
         private readonly IProductTypeRepository _productTypeRepository;
 
-        /// <summary>
+       
         /// Initializes a new instance of the <see cref="ProductTypeHandler"/> class.
-        /// </summary>
+        
         /// <param name="repository">The product type repository instance.</param>
         public ProductTypeHandler(IProductTypeRepository repository)
         {
             _productTypeRepository = repository;
         }
 
-        /// <summary>
+       
         /// Adds a new product type to the system.
-        /// </summary>
+        
         /// <param name="productType">The product type creation request.</param>
         /// <returns>The identifier of the newly created product type.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the request is null.</exception>
@@ -50,9 +50,9 @@ namespace Business.Handlers
             return await _productTypeRepository.AddProductType(entity);
         }
 
-        /// <summary>
+       
         /// Retrieves all product types from the system.
-        /// </summary>
+        
         /// <returns>A collection of product type entities.</returns>
         public Task<IEnumerable<Domain.EntityModel.ProductType>> GetAllProductTypes()
         {

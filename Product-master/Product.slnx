@@ -1,6 +1,0 @@
-<Solution>
-  <Project Path="API/API.csproj" />
-  <Project Path="Business/Business.csproj" />
-  <Project Path="Domain/Domain.csproj" />
-  <Project Path="Infrastructure/Infrastructure.csproj" />
-</Solution>
