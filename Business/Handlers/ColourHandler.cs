@@ -7,25 +7,25 @@
 
     namespace Business.Handlers
     {
-        /// <summary>
+       
         /// Handles business logic operations related to colours.
-        /// </summary>
+        
         public class ColourHandler : IColourHandler
         {
             private readonly IColourRepository _colourRepository;
 
-            /// <summary>
+           
             /// Initializes a new instance of the <see cref="ColourHandler"/> class.
-            /// </summary>
+            
             /// <param name="repository">The colour repository instance.</param>
             public ColourHandler(IColourRepository repository)
             {
                 _colourRepository = repository;
             }
 
-            /// <summary>
+           
             /// Adds a new colour to the system.
-            /// </summary>
+            
             /// <param name="colour">The colour creation request.</param>
             /// <returns>The identifier of the newly created colour.</returns>
             /// <exception cref="ArgumentNullException">Thrown when the request is null.</exception>
@@ -50,9 +50,9 @@
                 return await _colourRepository.AddColour(entity);
             }
 
-            /// <summary>
+           
             /// Retrieves all colours from the system.
-            /// </summary>
+            
             /// <returns>A collection of colour entities.</returns>
             public Task<IEnumerable<Domain.EntityModel.Colour>> GetAllColours()
             {

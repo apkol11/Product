@@ -38,15 +38,15 @@ namespace API.Controllers
         public async Task<IActionResult> Create([FromBody] ProductRequest request)
         {
             var id = await _handler.AddProduct(request);
-            
+
             var response = new CreatedResponse
             {
                 Id = id,
                 Message = "Product created successfully",
-                Location = Url.Action(nameof(GetById), new { id = id })
+                Location = Url.Action(nameof(GetById), new { id })
             };
 
-            return CreatedAtAction(nameof(GetById), new { id = id }, response);
+            return CreatedAtAction(nameof(GetById), new { id }, response);
         }
 
         /// <summary>
@@ -65,17 +65,26 @@ namespace API.Controllers
         /// <summary>
         /// Retrieves detailed information about a specific product.
         /// </summary>
-        /// <param name="id">The unique identifier of the product.</param>
+        /// <param name="id">The unique identifier of the product. Must be a positive integer.</param>
         /// <returns>Detailed product information including type and colours.</returns>
         /// <response code="200">Returns the product details.</response>
         /// <response code="404">Product not found.</response>
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int:min(1)}")]
         [ProducesResponseType(typeof(ProductDetailResponse), 200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult<ProductDetailResponse>> GetById(int id)
+        [ProducesResponseType(typeof(object), 404)]
+        public async Task<ActionResult<ProductDetailResponse>> GetById([FromRoute] int id)
         {
             var product = await _handler.GetProductById(id);
-            if (product == null) return NotFound();
+
+            if (product == null)
+            {
+                return NotFound(new
+                {
+                    Message = "Product not found",
+                    ProductId = id
+                });
+            }
+
             return Ok(product);
         }
     }
