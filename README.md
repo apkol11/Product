@@ -1,118 +1,158 @@
-﻿# Product Management API
-
-A RESTful API built with ASP.NET Core for managing products, product types, and colours with many-to-many relationships.
-
+# Product Management API Backend
+ 
+Welcome to the Product Management API Backend repository! This project provides a RESTful API built with ASP. NET Core for managing products, product types, and colours with many-to-many relationships.
+ 
 ## Table of Contents
-
+- [Features](#features)
+- [Tech Stack](#tech-stack)
 - [Prerequisites](#prerequisites)
-- [Project Structure](#project-structure)
-- [Technology Stack](#technology-stack)
-- [Getting Started](#getting-started)
-- [Database Setup](#database-setup)
-- [Configuration](#configuration)
-- [Running the Application](#running-the-application)
+- [Installation](#installation)
+  - [Step 1: Clone the Repository](#step-1-clone-the-repository)
+  - [Step 2: Configure the Database Connection](#step-2-configure-the-database-connection)
+  - [Step 3: Restore Dependencies and Build](#step-3-restore-dependencies-and-build)
+  - [Step 4: Database Setup](#step-4-database-setup)
+- [Usage](#usage)
+  - [Running the Application](#running-the-application)
+  - [Swagger](#swagger)
 - [API Endpoints](#api-endpoints)
-- [Testing with Swagger](#testing-with-swagger)
+- [Solution Structure](#solution-structure)
 - [Troubleshooting](#troubleshooting)
-
+- [License](#license)
+ 
+## Features
+- RESTful API with ASP.NET Core
+- Entity Framework Core for data access with SQLite
+- Swagger for API documentation
+- Dependency injection for services
+- Clean Architecture (Layered approach)
+- Many-to-many relationships between Products, Product Types, and Colours
+ 
+## Tech Stack
+- C# 14.0
+- ASP.NET Core
+- Entity Framework Core
+- SQLite
+- Swagger/OpenAPI
+ 
 ## Prerequisites
-
-Before setting up the project, ensure you have the following installed:
-
-- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
-- [Visual Studio 2026](https://visualstudio.microsoft.com/) or [Visual Studio Code](https://code.visualstudio.com/)
+- [. NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- [Visual Studio 2026](https://visualstudio.microsoft.com/) (or [Visual Studio Code](https://code.visualstudio.com/) with C# extensions)
 - [DB Browser for SQLite](https://sqlitebrowser.org/) (optional, for database inspection)
-- Git (for version control)
+- Git for version control
+ 
+## Installation
 
-## Project Structure
-Products/ ├── API/                          # Web API layer │   ├── Controllers/              # API controllers │   ├── appsettings.json          # Application configuration │   └── Program.cs                # Application entry point ├── Business/                     # Business logic layer │   ├── Handlers/                 # Business logic handlers │   └── Interfaces/               # Business interfaces │       ├── Handler/              # Handler interfaces │       └── Repository/           # Repository interfaces ├── Domain/                       # Domain models │   ├── EntityModel/              # Database entities │   ├── Request/                  # Request DTOs │   └── Response/                 # Response DTOs └── Infrastructure/               # Data access layer └── Data/                     # DbContext and repositories
+### Step 1: Clone the Repository
+```bash
+git clone <your-repository-url>
+cd Products
+```
+ 
+### Step 2: Configure the Database Connection
+ 
+Open `appsettings.json` in the API project and configure the connection string for the database.
+ 
+The application uses SQLite, and the database file will be created in the API project's execution directory (typically `API/bin/Debug/net10.0/app.db`).
+ 
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings":  {
+    "DefaultConnection": "Data Source=app.db"
+  }
+}
+```
 
-## Technology Stack
+### Step 3: Restore Dependencies and Build
 
-- **Framework**: .NET 10
-- **Language**: C# 14.0
-- **Database**: SQLite
-- **ORM**: Entity Framework Core
-- **API Documentation**: Swagger/OpenAPI
-- **Architecture**: Clean Architecture (Layered)
-
-## Getting Started
-
-### 1. Clone the Repository
-git clone <your-repository-url> cd Products
-
-### 2. Restore NuGet Packages
-
+Restore NuGet packages:
+```bash
 dotnet restore
+```
 
-### 3. Build the Solution
+Build the solution:
+```bash
 dotnet build
+```
 
-## Database Setup
+### Step 4: Database Setup
 
-### Connection String Configuration
-
-The application uses SQLite as the database. Configure the connection string in `appsettings.json`:
-{ "ConnectionStrings": { "DefaultConnection": "Data Source=app.db" } }
-
-**Note**: The database file will be created in the API project's execution directory (typically `API/bin/Debug/net10.0/app.db`).
-
-### Database Migrations
-
-If using Entity Framework migrations:
-
-Navigate to the API project directory
+Navigate to the API project directory: 
+```bash
 cd API
-Create a new migration
+```
+
+Create a new migration (if using Entity Framework migrations):
+```bash
 dotnet ef migrations add InitialCreate --project ../Infrastructure --startup-project .
+```
 
-Apply migrations to create the database
+Apply migrations to create the database:
+```bash
 dotnet ef database update --project ../Infrastructure --startup-project .
+```
 
-### Seed Sample Data (Optional)
+#### Seed Sample Data (Optional)
 
-To populate the database with sample data, you can:
+To populate the database with sample data:
 
 1. **Use the DbSeeder class** (if implemented):
    - The seeder runs automatically on application startup
    - Sample colours and product types will be inserted
 
-2. **Use SQL directly**:
+2. **Use SQL directly**: 
    - Open the database file in DB Browser for SQLite
-   - Run the following SQL:
--- Insert sample colours INSERT INTO Colours (ColourName, CreatedBy, CreatedDate) VALUES ('Red', 'system', datetime('now')), ('Blue', 'system', datetime('now')), ('Green', 'system', datetime('now')), ('Black', 'system', datetime('now')), ('White', 'system', datetime('now'));
--- Insert sample product types INSERT INTO ProductTypes (ProductTypeName, CreatedBy, CreatedDate) VALUES ('Electronics', 'system', datetime('now')), ('Clothing', 'system', datetime('now')), ('Furniture', 'system', datetime('now')), ('Books', 'system', datetime('now'));
-	
-	- 
-## Configuration
+   - Run SQL to insert sample data:
+   
+```sql
+-- Insert sample colours
+INSERT INTO Colours (ColourName, CreatedBy, CreatedDate) 
+VALUES 
+  ('Red', 'system', datetime('now')),
+  ('Blue', 'system', datetime('now')),
+  ('Green', 'system', datetime('now'));
 
-### appsettings.json
-{ "Logging": { "LogLevel": { "Default": "Information", "Microsoft.AspNetCore": "Warning" } }, "AllowedHosts": "*", "ConnectionStrings": { "DefaultConnection": "Data Source=app.db" } }
+-- Insert sample product types
+INSERT INTO ProductTypes (ProductTypeName, CreatedBy, CreatedDate) 
+VALUES 
+  ('Electronics', 'system', datetime('now')),
+  ('Clothing', 'system', datetime('now')),
+  ('Furniture', 'system', datetime('now'));
+```
+ 
+## Usage
+ 
+### Running the Application
+ 
+#### Command Line
 
-### Dependency Injection Setup
-
-Ensure services are registered in `Program.cs`:
-// Add DbContext builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-// Register repositories builder.Services.AddScoped<IProductRepository, ProductRepository>(); builder.Services.AddScoped<IColourRepository, ColourRepository>(); builder.Services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
-// Register handlers builder.Services.AddScoped<IProductHandler, ProductHandler>(); builder.Services.AddScoped<IColourHandler, ColourHandler>(); builder.Services.AddScoped<IProductTypeHandler, ProductTypeHandler>();
-
-## Running the Application
-
-### Using Visual Studio
-
-1. Set `API` project as the startup project
-2. Press `F5` or click the "Run" button
-3. The application will launch in your default browser
-
-### Using Command Line
-
-Navigate to the API project
+**Navigate to the API project directory:**
+```bash
 cd API
-Run the application
+```
+
+Start the application:
+```bash
 dotnet run
+```
 
-### Using IIS Express (Visual Studio)
+Start the application with hot reload:
+```bash
+dotnet watch run
+```
 
+#### Visual Studio
+1. Open the solution in Visual Studio
+2. Set `API` project as the startup project
+3. Press `Ctrl + F5` (or `F5` to run with the debugger) to start the application
+
+#### Using IIS Express
 1. Open the solution in Visual Studio
 2. Select "IIS Express" from the debug dropdown
 3. Press `F5`
@@ -122,53 +162,17 @@ The API will be available at:
 - HTTP: `http://localhost:5xxx`
 
 (Port numbers may vary based on your `launchSettings.json`)
-
-## API Endpoints
-
-### Products
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/product` | Get all products |
-| GET | `/api/product/{id}` | Get product by ID |
-| POST | `/api/product` | Create a new product |
-
-**Sample POST Request:**
-{ "name": "Laptop", "productTypeId": 1, "colourIds": [1, 2], "createdBy": "admin" }
-
-### Colours
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/colour` | Get all colours |
-| POST | `/api/colour` | Create a new colour |
-
-**Sample POST Request:**
-{ "colourName": "Yellow" }
-
-### Product Types
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/producttype` | Get all product types |
-| POST | `/api/producttype` | Create a new product type |
-
-**Sample POST Request:**
-{ "productTypeName": "Appliances" }
-
-## Testing with Swagger
-
+ 
+### Swagger
+ 
 The API includes Swagger UI for easy testing and documentation.
 
-### Accessing Swagger
+- Open the Swagger UI: `https://localhost:xxxx/swagger`
+- The Swagger UI will display all available endpoints with interactive documentation
 
-1. Run the application
-2. Navigate to: `https://localhost:xxxx/swagger`
-3. The Swagger UI will display all available endpoints
+#### Testing Workflow
 
-### Testing Workflow
-
-1. **Create Colours**:
+1. **Create Colours**: 
    - Expand `POST /api/colour`
    - Click "Try it out"
    - Enter colour data
@@ -191,6 +195,77 @@ The API includes Swagger UI for easy testing and documentation.
 4. **Retrieve Data**:
    - Use GET endpoints to verify created data
 
+## API Endpoints
+
+### Products
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/product` | Get all products |
+| GET | `/api/product/{id}` | Get product by ID |
+| POST | `/api/product` | Create a new product |
+
+**Sample POST Request:**
+```json
+{
+  "name": "Laptop",
+  "productTypeId": 1,
+  "colourIds": [1, 2],
+  "createdBy": "admin"
+}
+```
+
+### Colours
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/colour` | Get all colours |
+| POST | `/api/colour` | Create a new colour |
+
+**Sample POST Request:**
+```json
+{
+  "colourName": "Yellow"
+}
+```
+
+### Product Types
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/producttype` | Get all product types |
+| POST | `/api/producttype` | Create a new product type |
+
+**Sample POST Request:**
+```json
+{
+  "productTypeName":  "Appliances"
+}
+```
+
+## Solution Structure
+ 
+```sh
+Products/
+├── 📁 API                          # Application entry point, Web API layer
+│   ├── Controllers/                # API controllers
+│   ├── appsettings.json           # Application configuration
+│   └── Program.cs                 # Application startup
+│
+├── 📁 Application                  # Application layer with business logic
+│   ├── Handlers/                  # Request handlers
+│   └── DTOs/                      # Data transfer objects
+│
+├── 📁 Domain                       # Core business entities and logic
+│   ├── Entities/                  # Domain entities
+│   └── Interfaces/                # Repository interfaces
+│
+└── 📁 Infrastructure               # Data access and external services
+    ├── Data/                      # Database context
+    ├── Repositories/              # Repository implementations
+    └── Migrations/                # EF Core migrations
+```
+
 ## Troubleshooting
 
 ### Foreign Key Constraint Failed
@@ -212,23 +287,19 @@ The API includes Swagger UI for easy testing and documentation.
 
 1. **Wrong database file**: 
    - Check the actual database location by adding logging:
-	var dbPath = _context.Database.GetDbConnection().DataSource; Console.WriteLine($"Database: {dbPath}");
-	-    - Open the exact file path shown in the console
+   ```csharp
+   var dbPath = _context.Database.GetDbConnection().DataSource;
+   Console.WriteLine($"Database: {dbPath}");
+   ```
+   - Open the exact file path shown in the console
 
-2. **Application still running**:
+2. **Application still running**: 
    - Stop the application before querying the database
    - SQLite locks the file during active connections
 
-3. **Multiple database files**:
+3. **Multiple database files**: 
    - Search your solution folder for all `.db` files
    - Check file modification timestamps to find the active one
-
-### Swagger Validation Error
-
-**Error**: "Required field is not provided" for route parameters
-
-**Solution**: Ensure route parameters use type constraints:
-[HttpGet("{id:int}")]
 
 ### Application Won't Start
 
@@ -236,8 +307,11 @@ The API includes Swagger UI for easy testing and documentation.
    - Another application may be using the configured port
    - Modify ports in `launchSettings.json`
 
-2. **Missing dependencies**:
- dotnet restore dotnet build
+2. **Missing dependencies**: 
+   ```bash
+   dotnet restore
+   dotnet build
+   ```
 
 3. **Database connection**:
    - Verify connection string in `appsettings.json`
@@ -245,16 +319,19 @@ The API includes Swagger UI for easy testing and documentation.
 
 ### Entity Framework Issues
 
-**Migrations not found**:
+**Migrations not found**: 
+```bash
 dotnet ef migrations add InitialCreate --project Infrastructure --startup-project API
-dotnet ef migrations add InitialCreate --project Infrastructure --startup-project API
+```
 
 **Database not updating**:
+```bash
 dotnet ef database update --project Infrastructure --startup-project API
+```
 
-## Development Tips
+### Development Tips
 
-### Viewing Database Contents
+#### Viewing Database Contents
 
 1. **Using DB Browser for SQLite**:
    - Open the database file: `API/bin/Debug/net10.0/app.db`
@@ -264,18 +341,23 @@ dotnet ef database update --project Infrastructure --startup-project API
    - View → SQL Server Object Explorer
    - Add SQLite connection (may require extension)
 
-### Debugging
+#### Debugging
 
 1. Set breakpoints in your code
-2. Use the debugger to inspect:
+2. Use the debugger to inspect: 
    - Request payloads
    - Entity states
    - Database queries (check Output window → Debug)
 
-### Logging Database Queries
+#### Logging Database Queries
 
 Enable sensitive data logging in development:
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")) .EnableSensitiveDataLogging() .LogTo(Console.WriteLine, LogLevel.Information));
+```csharp
+builder.Services. AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+        .EnableSensitiveDataLogging()
+        .LogTo(Console.WriteLine, LogLevel.Information));
+```
 
 ## Additional Resources
 
@@ -290,5 +372,4 @@ Test Project
 
 ## Contributors
 
-Appala naidu Kolli/Test
-
+Appala Naidu Kolli
