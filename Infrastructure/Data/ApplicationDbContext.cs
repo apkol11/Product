@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {
+    /// <summary>
+    /// Represents the database context for the application.
+    /// </summary>
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)

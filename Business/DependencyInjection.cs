@@ -8,9 +8,10 @@ namespace Business
     {
         public static IServiceCollection AddBusinessServices(this IServiceCollection services)
         {
-            services.AddTransient<IProductHandler, ProductHandler>();
-            services.AddTransient<IColourHandler, ColourHandler>();
-            services.AddTransient<IProductTypeHandler, ProductTypeHandler>();
+            // Register Handlers
+            services.AddScoped<IProductHandler, ProductHandler>();
+            services.AddScoped<IColourHandler, ColourHandler>();
+            services.AddScoped<IProductTypeHandler, ProductTypeHandler>();
 
             return services;
         }

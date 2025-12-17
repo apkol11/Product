@@ -1,6 +1,7 @@
 ﻿using Business.Interfaces.Handler;
 using Business.Interfaces.Repository;
 using Domain.EntityModel;
+using Domain.Exceptions;
 using Domain.Request;
 using Domain.Response;
 
@@ -12,14 +13,20 @@ namespace Business.Handlers
     public class ProductHandler : IProductHandler
     {
         private readonly IProductRepository _repository;
+        private readonly IColourRepository _colourRepository;
+        private readonly IProductTypeRepository _productTypeRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductHandler"/> class.
         /// </summary>
-        /// <param name="repository">The product repository instance.</param>
-        public ProductHandler(IProductRepository repository)
+        public ProductHandler(
+            IProductRepository repository,
+            IColourRepository colourRepository,
+            IProductTypeRepository productTypeRepository)
         {
             _repository = repository;
+            _colourRepository = colourRepository;
+            _productTypeRepository = productTypeRepository;
         }
 
         /// <summary>
@@ -32,6 +39,39 @@ namespace Business.Handlers
             // Basic null check (data annotations handle the rest)
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
+
+            // Validate colour IDs exist
+            if (request.ColourIds == null || !request.ColourIds.Any())
+            {
+                throw new BadRequestException("At least one colour must be selected.");
+            }
+
+            // Check for invalid colour IDs (0 or negative)
+            if (request.ColourIds.Any(id => id <= 0))
+            {
+                throw new BadRequestException("Invalid colour ID. Colour IDs must be positive numbers.");
+            }
+
+            // Verify all colours exist
+            var allColours = await _colourRepository.GetAllColours();
+            var existingColourIds = allColours.Select(c => c.ColourId).ToList();
+            var invalidColourIds = request.ColourIds.Where(id => !existingColourIds.Contains(id)).ToList();
+
+            if (invalidColourIds.Any())
+            {
+                throw new BadRequestException(
+                    $"The following colour IDs do not exist: {string.Join(", ", invalidColourIds)}. " +
+                    $"Please create these colours first or use existing colour IDs.");
+            }
+
+            // Verify product type exists
+            var allProductTypes = await _productTypeRepository.GetAllProductTypes();
+            if (!allProductTypes.Any(pt => pt.ProductTypeId == request.ProductTypeId))
+            {
+                throw new BadRequestException(
+                    $"Product type with ID '{request.ProductTypeId}' does not exist. " +
+                    $"Please create the product type first or use an existing product type ID.");
+            }
 
             // Map request to entity with proper defaults
             var product = new Product

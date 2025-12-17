@@ -1,28 +1,25 @@
-﻿using Infrastructure.Data;
-using Business.Interfaces.Repository;
+﻿using Business.Interfaces.Repository;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureServices(
+            this IServiceCollection services,
+            IConfiguration configuration)
         {
-            // Register infrastructure services here
-
+            // Register DbContext
             services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
-             options.UseSqlite("Data Source=app.db")
-            );
-
-            services.AddTransient<IProductRepository, ProductRepository>();
-            services.AddTransient<IColourRepository, ColourRepository>();
-            services.AddTransient<IProductTypeRepository, ProductTypeRepository>();
+            // Register Repositories
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IColourRepository, ColourRepository>();
+            services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
 
             return services;
         }

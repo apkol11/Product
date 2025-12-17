@@ -1,8 +1,7 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Mvc;
+using API.Middleware;
 using Business;
 using Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,11 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddBusinessServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
+// Register global exception handler
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 // Add controllers with automatic model validation
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
     {
-        // Customize model validation error response
         options.InvalidModelStateResponseFactory = context =>
         {
             var errors = context.ModelState
@@ -32,27 +34,30 @@ builder.Services.AddControllers()
                 Message = "Validation failed",
                 Errors = errors
             };
-                
+
             return new BadRequestObjectResult(result);
         };
     });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+// Exception handler must be early in the pipeline
+app.UseExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "API v1");
-    });
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseAuthorization();
+app.UseHttpsRedirection();
+
+// Add API Key Authentication Middleware
+app.UseMiddleware<ApiKeyAuthenticationMiddleware>();
 
 app.MapControllers();
 

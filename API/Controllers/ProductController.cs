@@ -2,8 +2,6 @@ using Business.Interfaces.Handler;
 using Domain.Request;
 using Domain.Response;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace API.Controllers
 {
@@ -68,20 +66,48 @@ namespace API.Controllers
         /// <param name="id">The unique identifier of the product. Must be a positive integer.</param>
         /// <returns>Detailed product information including type and colours.</returns>
         /// <response code="200">Returns the product details.</response>
+        /// <response code="400">Invalid product ID.</response>
         /// <response code="404">Product not found.</response>
-        [HttpGet("{id:int:min(1)}")]
+        [HttpGet("{id}")]
         [ProducesResponseType(typeof(ProductDetailResponse), 200)]
-        [ProducesResponseType(typeof(object), 404)]
-        public async Task<ActionResult<ProductDetailResponse>> GetById([FromRoute] int id)
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 404)]
+        public async Task<ActionResult<ProductDetailResponse>> GetById([FromRoute] string id)
         {
-            var product = await _handler.GetProductById(id);
+            // Validate if id is a valid integer
+            if (!int.TryParse(id, out int productId))
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    Message = $"Invalid product ID format. '{id}' is not a valid number. Please provide a valid positive integer.",
+                    StatusCode = 400,
+                    TraceId = HttpContext.TraceIdentifier,
+                    Timestamp = DateTime.UtcNow
+                });
+            }
+
+            // Validate if id is positive
+            if (productId <= 0)
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    Message = $"Invalid product ID. Product ID must be a positive number greater than 0. Received: {productId}",
+                    StatusCode = 400,
+                    TraceId = HttpContext.TraceIdentifier,
+                    Timestamp = DateTime.UtcNow
+                });
+            }
+
+            var product = await _handler.GetProductById(productId);
 
             if (product == null)
             {
-                return NotFound(new
+                return NotFound(new ErrorResponse
                 {
-                    Message = "Product not found",
-                    ProductId = id
+                    Message = $"Product with ID {productId} was not found.",
+                    StatusCode = 404,
+                    TraceId = HttpContext.TraceIdentifier,
+                    Timestamp = DateTime.UtcNow
                 });
             }
 
